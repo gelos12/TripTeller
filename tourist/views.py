@@ -23,7 +23,7 @@ class ReViewContentFilterBackend(filters.BaseFilterBackend):
         for param in request.query_params:
             if param == 'content_id':
                 flt[param] = models.TouristSpot.objects.filter(content_id=request.query_params[param]).first()
-            elif param == 'created_filter':
+            elif param == 'filter':
                 if request.query_params[param] == 'True':
                     queryset.order_by('-created_at')
             else:
@@ -37,17 +37,28 @@ class TouristFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         flt = {}
         or_q=Q() #or쿼리문 받기 위한 
+
+        #content_id 를 &로 중복(Overlap)해서 줄경우 어떻게 처리해야할까?
+        #content_id 리스트를 만들자.
+        #직접 path를 url을 통해서 받아와 작업해준다.
+        for ttt in request.get_full_path_info().split('&'):
+            if 'content_id' in ttt:
+                or_q |= Q(content_id=ttt.replace("content_id=",""))
+        queryset = queryset.filter(or_q)
+        
         for param in request.query_params:
-            #content_id로 필터 요청한다면
-            if param == 'content_id':
-                #콤마를 구분하여 여러개의 content_id를 입력받을 수 있다.
-                for q in request.query_params[param].split(','):
-                    #or 검색 쿼리문을 만들고
-                    or_q |= Q(content_id=q)  
-                #필터에 적용한다.
-                queryset = queryset.filter(or_q)
+            
+            # #content_id로 필터 요청한다면
+            # if param == 'content_id':
+            #     #콤마를 구분하여 여러개의 content_id를 입력받을 수 있다.
+            #     for q in request.query_params[param].split(','):
+            #         #or 검색 쿼리문을 만들고
+            #         or_q |= Q(content_id=q)  
+            #     #필터에 적용한다.
+            #     queryset = queryset.filter(or_q)
             #그외의 작업
-            else:
+            #else:
+            if param != 'content_id':
                 for fld in view.filter_fields:
                     if param.startswith(fld):
                         flt[param] = request.query_params[param]

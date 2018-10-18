@@ -5,7 +5,6 @@ from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register(r'tourist', views.TouristSpotViewSet, base_name='tourist')
-router.register(r'tourist/mark', views.MarkViewSet, base_name="mark")
 router.register(r'mark', views.MarkViewSet, base_name="dmark")
 router.register(r'review', views.ReViewViewSet, base_name='review')
 

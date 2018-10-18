@@ -28,10 +28,9 @@ class CommentReViewSerializer(serializers.ModelSerializer):
     like = serializers.SerializerMethodField()
     class Meta:
         model = models.ReView
-        fields = ('pk','content_id', 'author', 'content', 'star_score', 'created_at', 'updated_at', 'like','photo','comment','areacode','sigungucode')
+        fields = ('pk','content_id', 'author', 'content', 'star_score', 'created_at',  'like','photo','comment','areacode','sigungucode')
         extra_kwargs = {
             'created_at': {'read_only': True},
-            'updated_at': {'read_only': True},
         }
     def get_like(self,obj):
         return obj.like_count
@@ -42,7 +41,7 @@ class ReViewSerializer(serializers.ModelSerializer):
     content_id = Fields.ContentIdField()
     author = Fields.AuthorField()
     like = serializers.SerializerMethodField()
-
+    created_at = serializers.SerializerMethodField()
     class Meta:
         model = models.ReView
         fields = ('pk','content_id', 'author', 'content', 'star_score', 'created_at', 'updated_at', 'like','photo','areacode','sigungucode')
@@ -52,7 +51,10 @@ class ReViewSerializer(serializers.ModelSerializer):
         }
     def get_like(self,obj):
         return obj.like_count
-        
+
+    def get_created_at(self,obj):
+        return obj.created_at.strftime('%y/%m/%d')
+
     def create(self, validated_data):
         photo_datas = self.context.get('view').request.FILES
         review = models.ReView.objects.create(content_id=validated_data.get('content_id'),
@@ -73,6 +75,7 @@ class TouristSpotSerializer(serializers.ModelSerializer):
     star = serializers.SerializerMethodField()
     review = serializers.SerializerMethodField()
     mark = serializers.SerializerMethodField()
+
     class Meta:
         model = models.TouristSpot
         #보여주기위해서 fields 변수 튜플에 들어가있어야한다.
@@ -82,11 +85,12 @@ class TouristSpotSerializer(serializers.ModelSerializer):
         a= obj.review_set.aggregate(Avg('star_score'))
         if a['star_score__avg'] == None:
             return 0
-        return a['star_score__avg']
+        return round(a['star_score__avg'],1)
 
     def get_review(self, obj):
         return obj.review_set.count()
     #tourist/?email=이메일 
+
     def get_mark(self, obj):
         query = self.context.get('request').query_params
         #쿼리가 있다면

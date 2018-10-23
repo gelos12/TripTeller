@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'accounts',
     'tourist',
     'django_filters',
+    'rest_framework_swagger',
 
 ]
 

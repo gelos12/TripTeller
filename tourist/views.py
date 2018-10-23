@@ -15,6 +15,7 @@ from . import serializers
 from . import models
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics
+import functools
 
 #후기 필터링
 class ReViewContentFilterBackend(filters.BaseFilterBackend):
@@ -36,17 +37,44 @@ class ReViewContentFilterBackend(filters.BaseFilterBackend):
 class TouristFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         flt = {}
-        or_q=Q() #or쿼리문 받기 위한 
+        or_list=[]
 
         #content_id 를 &로 중복(Overlap)해서 줄경우 어떻게 처리해야할까?
         #content_id 리스트를 만들자.
         #직접 path를 url을 통해서 받아와 작업해준다.
         for ttt in request.get_full_path_info().split('&'):
-            if 'content_id' in ttt:
-                or_q |= Q(content_id=ttt.replace("content_id=",""))
-        queryset = queryset.filter(or_q)
+            if not 'content_id' in ttt: 
+                pass
+            elif 'api/tourist/' in ttt:
+                #or_q |= Q(content_id= ttt.replace('/api/tourist/?content_id=',""))
+                or_list.append(ttt.replace('/api/tourist/?content_id=',""))
+            elif 'content_id' in ttt:
+                #or_q |= Q(content_id=ttt.replace("content_id=",""))
+                or_list.append(ttt.replace('content_id=',''))
+
+        #기존 or_q는 예외작업이 불가해서 리스트 방식으로 변경
+        #리스트로 content_id를 받아드리고
+        #하나하나 확인해서 없다면 생성한다.
+        for data in or_list:
+            tourist = models.TouristSpot.objects.filter(content_id=data).first()
+            if tourist is None:
+                models.TouristSpot.objects.create(content_id=data)
         
-        for param in request.query_params:
+        #요청한 쿼리셋만 or 하는 문장
+        if or_list:
+            queryset = queryset.filter(functools.reduce(lambda x, y :x | y, [Q(content_id=item) for item in or_list]))
+        
+        #순서대로 출력해주기 위해 한땀한땀 순서를 정해준다.
+        whens= []
+        idx=0
+        for qs in queryset:
+            idx=0
+            for cur in or_list:
+                if qs.content_id == int(or_list[idx]):
+                    whens.insert(idx, qs)
+                idx +=1
+
+        #for param in request.query_params:
             
             # #content_id로 필터 요청한다면
             # if param == 'content_id':
@@ -58,12 +86,13 @@ class TouristFilterBackend(filters.BaseFilterBackend):
             #     queryset = queryset.filter(or_q)
             #그외의 작업
             #else:
-            if param != 'content_id':
-                for fld in view.filter_fields:
-                    if param.startswith(fld):
-                        flt[param] = request.query_params[param]
+            # if param != 'content_id':
+            #     if param != 'email':
+            #         for fld in view.filter_fields:
+            #             if param.startswith(fld):
+            #                 flt[param] = request.query_params[param]
         #그외 작업 필터링
-        return queryset.filter(**flt)
+        return whens
 
 #관광지 뷰
 class TouristSpotViewSet(viewsets.ModelViewSet):
@@ -71,7 +100,6 @@ class TouristSpotViewSet(viewsets.ModelViewSet):
     queryset = models.TouristSpot.objects.all()
     serializer_class = serializers.TouristSpotSerializer
     filter_backends = (TouristFilterBackend,)
-    filter_fields = ('content_id','review')
 
 #관광지 후기 뷰
 class ReViewViewSet(viewsets.ModelViewSet):

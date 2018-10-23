@@ -42,6 +42,7 @@ class ReViewSerializer(serializers.ModelSerializer):
     author = Fields.AuthorField()
     like = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
+
     class Meta:
         model = models.ReView
         fields = ('pk','content_id', 'author', 'content', 'star_score', 'created_at', 'updated_at', 'like','photo','areacode','sigungucode')
@@ -75,11 +76,11 @@ class TouristSpotSerializer(serializers.ModelSerializer):
     star = serializers.SerializerMethodField()
     review = serializers.SerializerMethodField()
     mark = serializers.SerializerMethodField()
-
+    mark_cnt = serializers.SerializerMethodField()
     class Meta:
         model = models.TouristSpot
         #보여주기위해서 fields 변수 튜플에 들어가있어야한다.
-        fields = ('content_id','star','review','mark')
+        fields = ('content_id','star','review','mark_cnt','mark')
 
     def get_star(self, obj):
         a= obj.review_set.aggregate(Avg('star_score'))
@@ -91,10 +92,13 @@ class TouristSpotSerializer(serializers.ModelSerializer):
         return obj.review_set.count()
     #tourist/?email=이메일 
 
+    def get_mark_cnt(self,obj):
+        return obj.mark_set.count()
+
     def get_mark(self, obj):
         query = self.context.get('request').query_params
-        #쿼리가 있다면
-        if query:
+        #email 쿼리가 있다면
+        if query.get('email'):
             user = get_user_model().objects.filter(email=query['email']).first()
             is_mark = obj.mark_set.filter(user=user)
             if not is_mark:

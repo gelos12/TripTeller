@@ -26,6 +26,7 @@ class CommentReViewSerializer(serializers.ModelSerializer):
     content_id = Fields.ContentIdField()
     author = Fields.AuthorField()
     like = serializers.SerializerMethodField()
+    
     class Meta:
         model = models.ReView
         fields = ('pk','content_id', 'author', 'content', 'star_score', 'created_at',  'like','photo','comment','areacode','sigungucode')

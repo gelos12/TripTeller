@@ -10,6 +10,8 @@ router.register(r'review', views.ReViewViewSet, base_name='review')
 
 router.register(r'like', views.ReViewLikeViewSet, base_name='review_like')
 router.register(r'comment', views.CommentViewSet, base_name='comment')
+
+
 urlpatterns =[
     path('', include(router.urls)),
     path('main/', views.MainReViewViewSet.as_view(), name="main"),

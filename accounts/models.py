@@ -58,7 +58,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     #사진
     photo = models.ImageField(
-        verbose_name=_('profil photo'),
+        verbose_name=_('photo'),
         upload_to="account/%Y/%m/%d",
         blank=True,
         null=True,

@@ -122,6 +122,7 @@ class MainReViewViewSet(generics.ListAPIView):
     queryset = models.ReView.objects.all()
     serializer_class = serializers.CommentReViewSerializer
     filter_backends = (ReViewContentFilterBackend,)
+    
     def get_queryset(self):
         queryset = super(MainReViewViewSet, self).get_queryset()
         queryset = queryset.annotate(like=Count('like_user_set')).order_by('-like') # TODO

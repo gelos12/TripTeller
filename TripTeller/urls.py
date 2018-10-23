@@ -18,6 +18,12 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 from rest_framework_swagger.views import get_swagger_view
+from accounts import views
+from rest_framework import routers
+from rest_framework.routers import DefaultRouter
+
+m_routsers = DefaultRouter()
+m_routsers.register(r'user/signup', views.UserViewSet, base_name='signup')
 
 schema_view = get_swagger_view(title='TripTeller API')
 
@@ -27,6 +33,8 @@ urlpatterns = [
     path('api/', include('djoser.urls')),
     path('api/', include('djoser.urls.jwt')),
     path('api/', include('tourist.urls')),
+
+     path('api/', include(m_routsers.urls)),
     
 ]
 

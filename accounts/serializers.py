@@ -22,5 +22,4 @@ class UserSerializer(serializers.ModelSerializer):
         return 'error'
 
     def validate_password(self,pwd):
-        print(make_password(pwd))
         return make_password(pwd)

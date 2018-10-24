@@ -11,6 +11,8 @@ class TouristSpot(models.Model):
         through='SpotMark'
     )
 
+    def __str__(self):
+        return str(self.content_id)
 
 class SpotMark(models.Model):
     user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)

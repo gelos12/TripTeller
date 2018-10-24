@@ -66,13 +66,10 @@ class TouristFilterBackend(filters.BaseFilterBackend):
         
         #순서대로 출력해주기 위해 한땀한땀 순서를 정해준다.
         whens= []
-        idx=0
-        for qs in queryset:
-            idx=0
-            for cur in or_list:
-                if qs.content_id == int(or_list[idx]):
-                    whens.insert(idx, qs)
-                idx +=1
+        for item in or_list:
+            for qs in queryset:
+                if int(item) == qs.content_id:
+                    whens.append(qs)
 
         #for param in request.query_params:
             

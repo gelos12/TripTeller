@@ -18,6 +18,24 @@ from rest_framework import filters, generics
 import functools
 
 #후기 필터링
+class MarkFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        flt = {}
+        print("Assd")
+        for param in request.query_params:
+            if param == 'filter':
+                if request.query_params[param] == 'True':
+                    queryset.order_by('-created_at')
+            else:
+                for fld in view.filter_fields:
+                    if param == 'user':
+                        user = get_user_model().objects.filter(email=request.query_params[param]).first()
+                        flt[param] = user
+                    elif param.startswith(fld):
+                        flt[param] = request.query_params[param]
+        return queryset.filter(**flt).order_by('-created_at')
+
+#후기 필터링
 class ReViewContentFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         flt = {}
@@ -29,7 +47,10 @@ class ReViewContentFilterBackend(filters.BaseFilterBackend):
                     queryset.order_by('-created_at')
             else:
                 for fld in view.filter_fields:
-                    if param.startswith(fld):
+                    if fld == 'author':
+                        user = get_user_model().objects.filter(email=request.query_params[fld]).first()
+                        flt[param] = user
+                    elif param.startswith(fld):
                         flt[param] = request.query_params[param]
         return queryset.filter(**flt)
 
@@ -104,7 +125,7 @@ class ReViewViewSet(viewsets.ModelViewSet):
     queryset = models.ReView.objects.all()
     serializer_class = serializers.ReViewSerializer
     filter_backends = (ReViewContentFilterBackend, )
-    filter_fields = ('content_id','areacode','sigungucode')
+    filter_fields = ('content_id','areacode','sigungucode','author')
 
     #생성순 정렬
     def get_queryset(self):
@@ -129,7 +150,8 @@ class MainReViewViewSet(generics.ListAPIView):
 class MarkViewSet(viewsets.ModelViewSet):
     queryset = models.SpotMark.objects.all()
     serializer_class = serializers.SpotMarkSerializer
-
+    filter_backends = (MarkFilterBackend,)
+    filter_fields = ('user')
 
     #사용자가 보낸 객체 저장 방식 지정
     def perform_create(self, serializer):

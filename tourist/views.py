@@ -21,7 +21,6 @@ import functools
 class MarkFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         flt = {}
-        print("Assd")
         for param in request.query_params:
             if param == 'filter':
                 if request.query_params[param] == 'True':
@@ -47,12 +46,13 @@ class ReViewContentFilterBackend(filters.BaseFilterBackend):
                     queryset.order_by('-created_at')
             else:
                 for fld in view.filter_fields:
-                    
                     if param == 'author':
                         user = get_user_model().objects.filter(email=request.query_params[fld]).first()
                         flt[param] = user
                     elif param.startswith(fld):
                         flt[param] = request.query_params[param]
+        if request.query_params.get('areacode') or request.query_params.get('sigungucode'):
+            return queryset.filter(**flt).annotate(like=Count('like_user_set')).order_by('-like')
         return queryset.filter(**flt)
 
 #관광지 필터링

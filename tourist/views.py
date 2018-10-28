@@ -28,7 +28,7 @@ class ReViewViewSet(viewsets.ModelViewSet):
     queryset = models.ReView.objects.all()
     serializer_class = serializers.ReViewSerializer
     filter_backends = (touristFilterBackends.ReViewContentFilterBackend, )
-    filter_fields = ('content_id','areacode','sigungucode','author')
+    filter_fields = ('content_id','areacode','sigungucode','user')
 
     #생성순 정렬
     def get_queryset(self):

@@ -8,7 +8,7 @@ class UserListFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         flt = {}        
         for param in request.query_params:
-            if param == 'email':
+            if param == 'user':
                 user = models.User.objects.filter(email=request.query_params[param]).first()
                 flt['email'] = user.email
             else:
@@ -30,4 +30,4 @@ class UserListAPIView(generics.ListAPIView):
     queryset = models.User.objects.all()
     serializer_class = serializers.UserListSerializer
     filter_backends = (UserListFilterBackend,)
-    filter_fields =('email',)
+    filter_fields =('user',)

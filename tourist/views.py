@@ -15,7 +15,6 @@ from . import models
 from . import touristFilterBackends
 from django_filters.rest_framework import DjangoFilterBackend
 
-
 #관광지 뷰
 class TouristSpotViewSet(viewsets.ModelViewSet):
     #permission_classes = [permissions.IsAuthenticated]

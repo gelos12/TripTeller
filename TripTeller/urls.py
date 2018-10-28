@@ -33,8 +33,8 @@ urlpatterns = [
     path('api/', include('djoser.urls')),
     path('api/', include('djoser.urls.jwt')),
     path('api/', include('tourist.urls')),
-
-     path('api/', include(m_routsers.urls)),
+    path('api/', include(m_routsers.urls)),
+    path('api/user/', views.UserListAPIView.as_view(), name="user"),
     
 ]
 

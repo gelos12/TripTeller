@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 import functools
 from . import models
 
-#후기 필터링
+#찜 필터링
 class MarkFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         flt = {}
@@ -25,18 +25,19 @@ class MarkFilterBackend(filters.BaseFilterBackend):
 class ReViewContentFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         flt = {}
+        
         for param in request.query_params:
             if param == 'content_id':
                 flt[param] = models.TouristSpot.objects.filter(content_id=request.query_params[param]).first()
             elif param == 'filter':
                 if request.query_params[param] == 'True':
                     queryset.order_by('-created_at')
+            elif param =='author':
+                user = get_user_model().objects.filter(email=request.query_params[param]).first()
+                flt[param] = user
             else:
-                for fld in view.filter_fields:
-                    if param == 'author':
-                        user = get_user_model().objects.filter(email=request.query_params[fld]).first()
-                        flt[param] = user
-                    elif param.startswith(fld):
+                for fld in view.filter_fields:    
+                    if param.startswith(fld):
                         flt[param] = request.query_params[param]
         if request.query_params.get('areacode') or request.query_params.get('sigungucode'):
             return queryset.filter(**flt).annotate(like=Count('like_user_set')).order_by('-like')

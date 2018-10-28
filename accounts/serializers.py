@@ -23,3 +23,25 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate_password(self,pwd):
         return make_password(pwd)
+
+class UserListSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    review_cnt = serializers.SerializerMethodField()
+    mark_cnt = serializers.SerializerMethodField()
+    class Meta:
+        model = models.User
+        fields = ('image','review_cnt','mark_cnt')
+    
+    def get_review_cnt(self, obj):
+        return obj.review_set.count()
+    #tourist/?email=이메일 
+
+    def get_mark_cnt(self,obj):
+        return obj.spotmark_set.count()
+
+    def get_image(self, obj):
+        if bool(obj.photo) == True:
+            return self.context['request'].build_absolute_uri(obj.photo.url)
+        else:
+            return "http://"+self.context['request'].META['HTTP_HOST']+"/static/ubuntu.png"
+        return 'error' 

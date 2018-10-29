@@ -14,10 +14,13 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Comment
         #보여주기위해서 fields 변수 튜플에 들어가있어야한다.
-        fields = ('review_pk','author','content','image','created_at')        
+        fields = ('review','review_pk','author','content','image','created_at',)
+        extra_kwargs = {
+            'review': {'write_only':True},
+        }
 
     def get_review_pk(self, obj):
-        return obj.pk
+        return obj.review.pk
 
     def get_image(self, obj):
         if bool(obj.author.photo) == True:

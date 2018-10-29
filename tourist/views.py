@@ -2,7 +2,7 @@
 from django.shortcuts import render
 from django.contrib.auth import get_user_model
 from django.http import QueryDict
-
+from django.db.models import Q, Count
 #rest framework
 from rest_framework import viewsets,generics
 from rest_framework import views, permissions, status

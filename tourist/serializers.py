@@ -3,16 +3,31 @@ from . import models
 from django.contrib.auth import get_user_model
 from . import Fields
 from django.db.models import Avg
+import datetime
+#후기 댓글 
 class CommentSerializer(serializers.ModelSerializer):
+    review_pk = serializers.SerializerMethodField()
     author = Fields.AuthorField()
+    image = serializers.SerializerMethodField()
+    created_at = serializers.SerializerMethodField()
+
     class Meta:
         model = models.Comment
         #보여주기위해서 fields 변수 튜플에 들어가있어야한다.
-        fields = ('review','author','content','created_at','updated_at')
-        extra_kwargs = {
-            'created_at': {'read_only': True},
-            'updated_at': {'read_only': True},
-        } 
+        fields = ('review_pk','author','content','image','created_at')        
+
+    def get_review_pk(self, obj):
+        return obj.pk
+
+    def get_image(self, obj):
+        if bool(obj.author.photo) == True:
+            return self.context['request'].build_absolute_uri(obj.author.photo.url)
+        else:
+            return "http://"+self.context['request'].META['HTTP_HOST']+"/static/ubuntu.png"
+        return 'error'
+    
+    def get_created_at(self, obj):
+        return "aaa"
 
 #후기 사진 생성 시리얼라이저
 class ReViewPhotoSerializer(serializers.ModelSerializer):
@@ -20,22 +35,35 @@ class ReViewPhotoSerializer(serializers.ModelSerializer):
         model = models.ReViewPhoto
         fields = ('photo',)
 
+#메인 생성 시리얼라이저
 class CommentReViewSerializer(serializers.ModelSerializer):
     photo = ReViewPhotoSerializer(source='reviewphoto_set',many=True,read_only=True)
     comment = CommentSerializer(source='comment_set', many=True, read_only=True)
     content_id = Fields.ContentIdField()
     author = Fields.AuthorField()
     like = serializers.SerializerMethodField()
-    
+    image = serializers.SerializerMethodField()
+    created_at = serializers.SerializerMethodField()
     class Meta:
         model = models.ReView
-        fields = ('pk','content_id', 'author', 'content', 'star_score', 'created_at',  'like','photo','comment','areacode','sigungucode')
+        fields = ('pk','content_id', 'author', 'content', 'star_score', 'created_at',  'like','photo','comment','areacode','sigungucode','image')
         extra_kwargs = {
             'created_at': {'read_only': True},
         }
+        
+    def get_created_at(self, obj):
+        return "aaa"
+
     def get_like(self,obj):
         return obj.like_count
     
+    def get_image(self, obj):
+        if bool(obj.author.photo) == True:
+            return self.context['request'].build_absolute_uri(obj.author.photo.url)
+        else:
+            return "http://"+self.context['request'].META['HTTP_HOST']+"/static/ubuntu.png"
+        return 'error'
+
 #후기 생성 시리얼라이저
 class ReViewSerializer(serializers.ModelSerializer):
     photo = ReViewPhotoSerializer(source='reviewphoto_set',many=True,read_only=True)

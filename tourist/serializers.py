@@ -3,13 +3,28 @@ from . import models
 from django.contrib.auth import get_user_model
 from . import Fields
 from django.db.models import Avg
-import datetime
+import datetime, time
 from django.utils import timezone
+from calendar import monthrange
 
 def get_ago(lastout):
-    now = timezone.now()
-    print(now)
-    return now
+    dt = timezone.now() - lastout
+
+    days = dt.days
+    hour = dt.seconds//3600
+    minute = (dt.seconds//60) % 60
+    second = (dt.seconds % 60) 
+    
+    if days > 0:
+        return "{}일 전".format(days)
+    elif hour > 0:
+        return "{}시간 전".format(hour)
+    elif minute > 0:
+        return "{}분전".format(minute)
+    else:
+        return "{}초  전".format(second)
+    return "error"
+
 #후기 댓글 
 class CommentSerializer(serializers.ModelSerializer):
     review_pk = serializers.SerializerMethodField()
@@ -36,8 +51,7 @@ class CommentSerializer(serializers.ModelSerializer):
         return 'error'
     
     def get_created_at(self, obj):
-        get_ago(obj.created_at)
-        return "aaa"
+        return get_ago(obj.created_at)
 
 #후기 사진 생성 시리얼라이저
 class ReViewPhotoSerializer(serializers.ModelSerializer):
@@ -75,7 +89,7 @@ class CommentReViewSerializer(serializers.ModelSerializer):
         return False
 
     def get_created_at(self, obj):
-        return "aaa"
+        return get_ago(obj.created_at)
 
     def get_like(self,obj):
         return obj.like_count
@@ -106,7 +120,7 @@ class ReViewSerializer(serializers.ModelSerializer):
         return obj.like_count
 
     def get_created_at(self,obj):
-        return obj.created_at.strftime('%y/%m/%d')
+        return get_ago(obj.created_at)
 
     def create(self, validated_data):
         photo_datas = self.context.get('view').request.FILES

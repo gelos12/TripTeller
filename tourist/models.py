@@ -65,6 +65,7 @@ class ReViewLike(models.Model):
     user = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
+        related_name = 'user_like_set',
     )
 
     review = models.ForeignKey(

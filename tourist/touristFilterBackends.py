@@ -32,6 +32,8 @@ class ReViewContentFilterBackend(filters.BaseFilterBackend):
             elif param == 'filter':
                 if request.query_params[param] == 'True':
                     queryset.order_by('-created_at')
+            elif param == "email":
+                pass
             elif param =='user':
                 user = get_user_model().objects.filter(email=request.query_params[param]).first()
                 flt['author'] = user

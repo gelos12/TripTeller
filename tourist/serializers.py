@@ -4,6 +4,12 @@ from django.contrib.auth import get_user_model
 from . import Fields
 from django.db.models import Avg
 import datetime
+from django.utils import timezone
+
+def get_ago(lastout):
+    now = timezone.now()
+    print(now)
+    return now
 #후기 댓글 
 class CommentSerializer(serializers.ModelSerializer):
     review_pk = serializers.SerializerMethodField()
@@ -30,6 +36,7 @@ class CommentSerializer(serializers.ModelSerializer):
         return 'error'
     
     def get_created_at(self, obj):
+        get_ago(obj.created_at)
         return "aaa"
 
 #후기 사진 생성 시리얼라이저
@@ -45,15 +52,28 @@ class CommentReViewSerializer(serializers.ModelSerializer):
     content_id = Fields.ContentIdField()
     author = Fields.AuthorField()
     like = serializers.SerializerMethodField()
+    is_like = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
     class Meta:
         model = models.ReView
-        fields = ('pk','content_id', 'author', 'content', 'star_score', 'created_at',  'like','photo','comment','areacode','sigungucode','image')
+        fields = ('pk','content_id', 'author', 'content', 'star_score', 'created_at',  'like','is_like','photo','comment','areacode','sigungucode','image')
         extra_kwargs = {
             'created_at': {'read_only': True},
         }
         
+    def get_is_like(self,obj):
+        query = self.context.get('request').query_params
+        #email 쿼리가 있다면
+        if query.get('email'):
+            user = get_user_model().objects.filter(email=query['email']).first()
+            is_like = obj.like_set.filter(user=user)
+            if not is_like:
+                return False
+            else:
+                return True
+        return False
+
     def get_created_at(self, obj):
         return "aaa"
 
@@ -127,6 +147,7 @@ class TouristSpotSerializer(serializers.ModelSerializer):
     def get_mark_cnt(self,obj):
         return obj.mark_set.count()
 
+    #마크있는지 여부
     def get_mark(self, obj):
         query = self.context.get('request').query_params
         #email 쿼리가 있다면

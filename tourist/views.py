@@ -43,7 +43,7 @@ class MainReViewViewSet(generics.ListAPIView):
     queryset = models.ReView.objects.all()
     serializer_class = serializers.CommentReViewSerializer
     filter_backends = (touristFilterBackends.ReViewContentFilterBackend,)
-    filter_fields=('email',)
+    filter_fields=('email','pk')
     
     def get_queryset(self):
         queryset = super(MainReViewViewSet, self).get_queryset()

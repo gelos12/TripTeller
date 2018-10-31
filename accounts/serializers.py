@@ -30,7 +30,7 @@ class UserListSerializer(serializers.ModelSerializer):
     mark_cnt = serializers.SerializerMethodField()
     class Meta:
         model = models.User
-        fields = ('image','review_cnt','mark_cnt')
+        fields = ('image','review_cnt','mark_cnt','nickname')
     
     def get_review_cnt(self, obj):
         return obj.review_set.count()

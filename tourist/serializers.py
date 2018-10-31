@@ -108,10 +108,10 @@ class ReViewSerializer(serializers.ModelSerializer):
     author = Fields.AuthorField()
     like = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
-
+    image = serializers.SerializerMethodField()
     class Meta:
         model = models.ReView
-        fields = ('pk','content_id', 'author', 'content', 'star_score', 'created_at', 'updated_at', 'like','photo','areacode','sigungucode')
+        fields = ('pk','content_id', 'author','image', 'content', 'star_score', 'created_at', 'updated_at', 'like','photo','areacode','sigungucode')
         extra_kwargs = {
             'created_at': {'read_only': True},
             'updated_at': {'read_only': True},
@@ -122,6 +122,13 @@ class ReViewSerializer(serializers.ModelSerializer):
     def get_created_at(self,obj):
         return get_ago(obj.created_at)
 
+    def get_image(self, obj):
+        if bool(obj.author.photo) == True:
+            return self.context['request'].build_absolute_uri(obj.author.photo.url)
+        else:
+            return "http://"+self.context['request'].META['HTTP_HOST']+"/static/ubuntu.png"
+        return 'error'
+        
     def create(self, validated_data):
         photo_datas = self.context.get('view').request.FILES
         review = models.ReView.objects.create(content_id=validated_data.get('content_id'),
@@ -135,7 +142,7 @@ class ReViewSerializer(serializers.ModelSerializer):
             models.ReViewPhoto.objects.create(review=review,photo=photo)
 
         return review
-
+    
 #관광지 시리얼라이저
 #찜 갯수/ 리뷰 갯수 / 총 평점
 class TouristSpotSerializer(serializers.ModelSerializer):

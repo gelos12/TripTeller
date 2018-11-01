@@ -35,6 +35,7 @@ urlpatterns = [
     path('api/', include('tourist.urls')),
     path('api/', include(m_routsers.urls)),
     path('api/user/', views.UserListAPIView.as_view(), name="user"),
+    path('api/user/ranking/', views.UserRankingListAPIView.as_view(), name="ranking")
     
 ]
 

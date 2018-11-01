@@ -35,6 +35,7 @@ class ReView(models.Model):
     author = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
+        related_name='review_set',
     )
     content = models.TextField(
         '후기',

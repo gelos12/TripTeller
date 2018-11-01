@@ -45,3 +45,28 @@ class UserListSerializer(serializers.ModelSerializer):
         else:
             return "http://"+self.context['request'].META['HTTP_HOST']+"/static/ubuntu.png"
         return 'error' 
+
+class UserRankingListSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    ranking = serializers.SerializerMethodField()
+    count = 0
+
+    class Meta:
+        model = models.User
+        fields = ('ranking','nickname','image','nickname')
+        
+    def get_review_cnt(self, obj):
+        return obj.review_set.count()
+    #tourist/?email=이메일 
+
+    def get_ranking(self,obj):
+        self.count+=1
+        print(self.count)
+        return str(self.count)
+
+    def get_image(self, obj):
+        if bool(obj.photo) == True:
+            return self.context['request'].build_absolute_uri(obj.photo.url)
+        else:
+            return "http://"+self.context['request'].META['HTTP_HOST']+"/static/ubuntu.png"
+        return 'error' 

@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework import viewsets, generics, filters
 from . import models
 from . import serializers
+from django.db.models import Q, Count
 
 #유저 검색 필터링
 class UserListFilterBackend(filters.BaseFilterBackend):
@@ -31,3 +32,15 @@ class UserListAPIView(generics.ListAPIView):
     serializer_class = serializers.UserListSerializer
     filter_backends = (UserListFilterBackend,)
     filter_fields =('user',)
+
+#유저 정보 뷰
+class UserRankingListAPIView(generics.ListAPIView):
+    #permission_classes = [permissions.IsAuthenticated]  
+    model = models.User
+    queryset = models.User.objects.all()
+    serializer_class = serializers.UserRankingListSerializer
+
+    def get_queryset(self):
+        queryset = super(UserRankingListAPIView, self).get_queryset()
+        queryset = queryset.annotate(review=Count('review_set')).order_by('-review') # TODO
+        return queryset

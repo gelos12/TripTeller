@@ -18,7 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
         if bool(obj.photo) == True:
             return self.context['request'].build_absolute_uri(obj.photo.url)
         else:
-            return "http://"+self.context['request'].META['HTTP_HOST']+"/static/ubuntu.png"
+            return "http://"+self.context['request'].META['HTTP_HOST']+"/static/user.jpgg"
         return 'error'
 
     def validate_password(self,pwd):
@@ -43,7 +43,7 @@ class UserListSerializer(serializers.ModelSerializer):
         if bool(obj.photo) == True:
             return self.context['request'].build_absolute_uri(obj.photo.url)
         else:
-            return "http://"+self.context['request'].META['HTTP_HOST']+"/static/ubuntu.png"
+            return "http://"+self.context['request'].META['HTTP_HOST']+"/static/user.jpg"
         return 'error' 
 
 class UserRankingListSerializer(serializers.ModelSerializer):
@@ -68,5 +68,5 @@ class UserRankingListSerializer(serializers.ModelSerializer):
         if bool(obj.photo) == True:
             return self.context['request'].build_absolute_uri(obj.photo.url)
         else:
-            return "http://"+self.context['request'].META['HTTP_HOST']+"/static/ubuntu.png"
+            return "http://"+self.context['request'].META['HTTP_HOST']+"/static/user.jpg"
         return 'error' 

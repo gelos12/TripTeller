@@ -35,9 +35,10 @@ class ReViewContentFilterBackend(filters.BaseFilterBackend):
             elif param == "email":
                 pass
             elif param =='user':
-                if request.query_params[param]:
+                if request.query_params.get('content_id', None) is not None:
                     pass
                 else:
+                    print("Asd")
                     user = get_user_model().objects.filter(email=request.query_params[param]).first()
                     flt['author'] = user
             else:

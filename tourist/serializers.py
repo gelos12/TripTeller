@@ -47,7 +47,7 @@ class CommentSerializer(serializers.ModelSerializer):
         if bool(obj.author.photo) == True:
             return self.context['request'].build_absolute_uri(obj.author.photo.url)
         else:
-            return "http://"+self.context['request'].META['HTTP_HOST']+"/static/ubuntu.png"
+            return "http://"+self.context['request'].META['HTTP_HOST']+"/static/user.jpg"
         return 'error'
     
     def get_created_at(self, obj):
@@ -99,7 +99,7 @@ class CommentReViewSerializer(serializers.ModelSerializer):
         if bool(obj.author.photo) == True:
             return self.context['request'].build_absolute_uri(obj.author.photo.url)
         else:
-            return "http://"+self.context['request'].META['HTTP_HOST']+"/static/ubuntu.png"
+            return "http://"+self.context['request'].META['HTTP_HOST']+"/static/user.jpg"
         return 'error'
 
 #후기 생성 시리얼라이저
@@ -128,7 +128,7 @@ class ReViewSerializer(serializers.ModelSerializer):
         if bool(obj.author.photo) == True:
             return self.context['request'].build_absolute_uri(obj.author.photo.url)
         else:
-            return "http://"+self.context['request'].META['HTTP_HOST']+"/static/ubuntu.png"
+            return "http://"+self.context['request'].META['HTTP_HOST']+"/static/user.jpg"
         return 'error'
 
     def get_is_like(self,obj):

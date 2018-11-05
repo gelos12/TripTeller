@@ -35,8 +35,11 @@ class ReViewContentFilterBackend(filters.BaseFilterBackend):
             elif param == "email":
                 pass
             elif param =='user':
-                user = get_user_model().objects.filter(email=request.query_params[param]).first()
-                flt['author'] = user
+                if request.query_params[param]:
+                    pass
+                else:
+                    user = get_user_model().objects.filter(email=request.query_params[param]).first()
+                    flt['author'] = user
             else:
                 for fld in view.filter_fields:    
                     if param.startswith(fld):

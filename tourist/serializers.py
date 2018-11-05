@@ -69,6 +69,7 @@ class CommentReViewSerializer(serializers.ModelSerializer):
     is_like = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
+
     class Meta:
         model = models.ReView
         fields = ('pk','content_id', 'author', 'content', 'star_score', 'created_at',  'like','is_like','photo','comment','areacode','sigungucode','image')
@@ -107,11 +108,12 @@ class ReViewSerializer(serializers.ModelSerializer):
     content_id = Fields.ContentIdField()
     author = Fields.AuthorField()
     like = serializers.SerializerMethodField()
+    is_like = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
     class Meta:
         model = models.ReView
-        fields = ('pk','content_id', 'author','image', 'content', 'star_score', 'created_at', 'updated_at', 'like','photo','areacode','sigungucode')
+        fields = ('pk','content_id', 'author','image', 'content', 'star_score', 'created_at', 'updated_at', 'like','is_like','photo','areacode','sigungucode')
         extra_kwargs = {
             'created_at': {'read_only': True},
             'updated_at': {'read_only': True},
@@ -128,7 +130,19 @@ class ReViewSerializer(serializers.ModelSerializer):
         else:
             return "http://"+self.context['request'].META['HTTP_HOST']+"/static/ubuntu.png"
         return 'error'
-        
+
+    def get_is_like(self,obj):
+        query = self.context.get('request').query_params
+        #email 쿼리가 있다면
+        if query.get('user'):
+            user = get_user_model().objects.filter(email=query['user']).first()
+            is_like = obj.like_set.filter(user=user)
+            if not is_like:
+                return False
+            else:
+                return True
+        return False
+
     def create(self, validated_data):
         photo_datas = self.context.get('view').request.FILES
         review = models.ReView.objects.create(content_id=validated_data.get('content_id'),

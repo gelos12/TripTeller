@@ -1,6 +1,16 @@
-# TripTeller
+# TripTeller API SERVICE
 ## 1. 한국 관광공사 ICT개발 경진대회 출품을 위해 준비했던 API SERVICE
 ### 안타깝게도 대학생 공모전은 중지..
 
-## 2. Python DJango로 구현.
-### 자세한 종속 라이브러리들은 requirement.txt 참고
+## 2. 개발 환경
+ 1. Ubuntu 16.0.4 LTS AWS EC2 환경
+ 2. APACHE2 
+ 3. DJANGO 2.1.2
+ 4. DJANGO RESTFRAMEWORK 3.9.0
+
+## 3. 본 프로젝트에서 주요 구현 기능
+ 1. API 서비스에서 기본 제공해주는 필터기능을 커스텀하여 BACKEND FILTER 구현
+ 2. API 서비스에서 상황에따라 프레임워크가 구현해주는 필드가 아닌 커스텀 필드 필요한 경우가 발생, 
+   커스텀필드를 커스텀하여 직접 구현 완료, EX)프레임워크 상에서 PK 값을 보여주는게 맞지만 PK값보단 해당 모델의 이름, 등 
+   다른 데이터가 필요할 경우
+ 3. 기타 기능 : 게시글 생성, 댓글 생성, 좋아요, 랭킹 구현, 로그인(커스텀)
